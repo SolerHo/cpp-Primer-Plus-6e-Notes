@@ -5,7 +5,7 @@
  * 
  * Book : C++ Primer Plus
  * 
- * Chapter : THREE
+ * Chapter : FOUR
  * 
  * description :  数组知识的应用
  * 
