@@ -5,7 +5,7 @@
  * 
  * Book : C++ Primer Plus
  * 
- * Chapter : FIVE
+ * Chapter : SIX
  * 
  * description :  使用&&符号来设置取值范围
  * 
