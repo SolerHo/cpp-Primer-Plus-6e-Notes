@@ -5,7 +5,7 @@
  * 
  * Book : C++ Primer Plus
  * 
- * Chapter : FIVE
+ * Chapter : SIX
  * 
  * description :  逻辑AND运算符：&&
  * 
