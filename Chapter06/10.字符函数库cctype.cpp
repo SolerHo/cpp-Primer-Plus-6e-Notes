@@ -5,7 +5,7 @@
  * 
  * Book : C++ Primer Plus
  * 
- * Chapter : FIVE
+ * Chapter : SIX
  * 
  * description :  字符函数库cctype
  * 
