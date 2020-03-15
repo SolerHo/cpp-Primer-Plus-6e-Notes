@@ -5,7 +5,7 @@
  * 
  * Book : C++ Primer Plus
  * 
- * Chapter : FIVE
+ * Chapter : SIX
  * 
  * description :  if else语句的例子
  * 
