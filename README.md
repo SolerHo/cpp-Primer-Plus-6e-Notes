@@ -1,4 +1,12 @@
 # C++ Primer Plus （第六版） 学习笔记
+
+### 学习环境
+- ***系统***：`CentOS Linux release 8.0.1905 (Core)`
+- ***IDE***：` Visual Studio Code` ————> remote development ssh连接云服务器开发
+- ***编译器***：`g++ (GCC) 8.3.1 20191121 (Red Hat 8.3.1-5)`
+
+
+
 |章（Chapter）|标题（Title）|笔记（Notes）|复习题（Review）|编程练习题（Practice）|
 |:--:|:--:|:--:|:--:|:--:|
 |01|C++概述|「[Click Here]()」|「等待更新」|「[Click Here]()」|
