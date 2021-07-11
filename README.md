@@ -10,7 +10,7 @@
 |章（Chapter）|标题（Title）|笔记（Notes）|复习题（Review）|编程练习题（Practice）|
 |:--:|:--:|:--:|:--:|:--:|
 |01|C++概述|「[Click Here](./Chapter01/README.md)」|「NA」|「NA」|
-|02|开始学习C++|「[Click Here](./Chapter02/README.md)」|「[Click Here](./Chapter01/复习题.md)」|「[Click Here](./Chapter01/Codes/)」|
+|02|开始学习C++|「[Click Here](./Chapter02/README.md)」|「[Click Here](./Chapter02/复习题.md)」|「[Click Here](./Chapter02/Codes/)」|
 |03|处理数据|「[Click Here](./Chapter03/README.md)」|等待更新|等待更新|
 |04|复合类型|等待更新|等待更新|等待更新|
 |05|循环和关系表达式|等待更新|等待更新|等待更新|
