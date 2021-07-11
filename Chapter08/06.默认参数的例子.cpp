@@ -11,7 +11,7 @@
  * 
  ********************************************************************/
 
-#include<iostream.h>
+#include<iostream>
 
 const int ArSize = 80;
 

@@ -31,7 +31,7 @@ C++区别于C语言，提供了新特性：包括 **`内联函数、按引用传
 - 在函数 `声明前` 加上 关键字inline
 - 在函数 `定义前` 加上 关键字inline
 - 一般用法：省略原型，将整个定义（函数头和所有函数代码）放在本应提供原型的地方。
-- ⚠️注意点：~~内联函数不能递归~~
+- ⚠️注意点：~~内联函数不能递归，末尾不加分号(;)~~
 
 👉例子：square函数计算
 
@@ -80,7 +80,7 @@ inline是C++新增特性。
 
 #### 2.1 创建引用变量
 
-C和C++中使用 `地址符（&）` 来指示变量的地址。用来声明引用。
+C和C++中使用 `地址符（&）` 来指示变量的地址。用来声明引用。 <u>（符号重载）</u>
 
 ```c++
 int rats;
@@ -93,7 +93,7 @@ int & rodents = rats; // &不是地址运算符，是类型标识符的一部分
 
 #### 2.2 引用用作函数参数
 
-**引用传递**：当引用被用作函数参数时，使得函数中的变量名成为调用程序中的变量的别名。
+**引用传递**：当引用被用作`函数参数`时，使得函数中的变量名成为`调用程序中的变量的别名`。
 
 > 允许被调用的函数能够`访问调用函数`中的变量。
 
@@ -104,44 +104,167 @@ int & rodents = rats; // &不是地址运算符，是类型标识符的一部分
 使用和访问原始数据的方法：按 **`引用传递`** 和 **`传递指针`**。
 
 当左值引用参数是 const时，会生成临时变量的两种情况：
+> 左值参数：可被引用的数据对象。
 
-> 实参的类型正确，但不是左值。
->
-> 实参的类型不正确，但可转换为正确的类型。
+- 实参的类型正确，但不是左值。
+
+- 实参的类型不正确，但可转换为正确的类型。
 
 **尽可能使用const**
 
 >- 使用const可以避免无意中修改数据的编程错误
 >
->- 使用const使函数能够处理const和非const实参 否则只能接受非const数据
+>- 使用const使函数能够处理`const`和`非const实参` ，否则只能接受`非const数据`。
 >
->- 使用const引用使函数能够正确生成并使用临时变量(如果实参和应用参数不匹配，c++将生成临时变量)
+>- 使用`const引用`使函数能够正确生成并使用`临时变量`(如果`实参`和`引用参数`不匹配，c++将生成`临时变量`)。
 
 C++11 引入 **`右值引用`**，可指向右值，使用 `&&` 来声明。
+
+代码例子 👇
+```cpp
+#include<iostream>
+
+using namespace std;
+
+double cube(double a);
+double refcube(const double &ra); // 使用const的目的：防止引用的参数被修改。
+
+int main()
+{
+    double x = 3.0;
+    cout<<x<<" 的立方为: "<<cube(x)<<endl;
+    cout<<x<<" 的立方为："<<refcube(x)<<endl;
+    return 0;
+}
+double cube(double a)
+{
+    return a*a*a;
+}
+double refcube(const double &ra)
+{
+    return ra*ra*ra;
+}
+```
+
+⚠️注意：如果函数调用的参数不是左值或与相对应的const引用参数的类型不匹配，则C++将创建类型正确的匿名变量，将函数调用的参数的值传递给匿名变量，并让参数来引用该变量。
+
 
 #### 2.3 结构引用
 
 引用适合 **结构和类**（用户自定义类型，非基本的内置类型）。
 
+**<u>引入引用的目的</u>**：用于用户自定义类型，而不是基本的内置类型。
+
 使用 `结构引用参数`的方式 与`基本变量引用` 相同，只需在声明结构参数时使用 `引用运算符&` 即可。
 
+代码例子 👇
+```cpp
+#include<iostream>
+#include<string>
+
+using namespace std;
+
+/*创建结构*/
+struct free_throws
+{
+    string name;
+    int made;
+    int attempts;
+    float percent;
+};
+
+/*声明函数原型*/
+void display(const free_throws & ft); 
+void set_pc(free_throws & ft);
+free_throws & accumulate(free_throws & target,const free_throws & source);
+
+int main()
+{
+    /*对部分初始化，其余部分设置为0*/
+    free_throws one = {"ifelsa branch",13,14};
+    free_throws two = {"Andor Knott",10,16};
+    free_throws three = {"Minnie Max",7,9};
+    free_throws four = {"Whily Looper",5,9};
+    free_throws five = {"Long Long",6,14};
+    free_throws team = {"Throwgoods",0,0};
+
+    /*不做初始化*/
+    free_throws dup;
+
+    set_pc(one); /*set_pc中的ft为引用，按值传递不可行*/
+    display(one); /*使用const引用参数，可以使用按值传递结构，但是使用引用的好处：可以节省时间和内存*/
+    accumulate(team,one); /*第一个参数：引用 ———— 可修改，第二个参数：const引用*/
+    display(team);
+
+    /*使用返回值作为参数*/
+    display(accumulate(team,two));
+    accumulate(accumulate(team,three),four);
+    display(team);
+
+    /*使用返回值进行赋值*/
+    dup = accumulate(team,five); /*添加five的数据给dup*/
+    cout<<"Displaying team:\n";
+    display(team);
+    cout<<"Displaying dup after assignment:\n";
+    display(dup);
+    set_pc(four);
+
+    /*ill-advised assignment*/
+    
+    /*将five的数据添加到dup中，再使用four的内容覆盖dup的内容。返回类型是const，不可修改，所以赋值不合法。*/
+    accumulate(dup,five) = four;   
+    cout<<"Displaying dup after ill-advised assignment:\n";
+    display(dup);
+    return 0;
+}
+
+/*输出展示*/
+void display(const free_throws & ft)
+{
+    cout<<"Name : "<<ft.name<<'\n';
+    cout<<"Made : "<<ft.made<<'\t';
+    cout<<"Attempts : "<<ft.attempts<<'\t';
+    cout<<"Percent : "<<ft.percent<<'\n';
+}
+
+/*计算*/
+void set_pc(free_throws & ft)
+{
+    if(ft.attempts!=0)
+        ft.percent = 100.0f * float(ft.made)/float(ft.attempts);
+    else
+        ft.percent = 0;    
+}
+
+/**/
+free_throws & accumulate(free_throws & target,const free_throws & source) /*const类型，所以不可修改*/ 
+{
+    target.attempts += source.attempts;
+    target.made += source.made;
+    set_pc(target);
+    return target;
+}
+```
+
 #### 2.4 返回引用时的注意事项
+
 避免返回函数终止时不再存在的内存单元引用。原因：函数运行完毕后将不存在。
 
 ~~杜绝使用临时变量的引用~~
+
 ```cpp
 const free_throws & clone2(free_throws &ft)
 {
-	free_throws newguy; // 
-	newguy = &ft; // 拷贝
-	return newguy; //返回拷贝引用
+	free_throws newguy; 
+	newguy = ft; // 拷贝
+	return newguy; //返回拷贝引用，返回一个指向临时变量newguy的引用，函数执行完毕后则不存在。
 }
 ```
 > 解决方法：
 > 
 > 1.返回一个作为参数传递给函数的引用。作为参数的引用将指向调用函数使用的数据，返回的引用也随之指向所使用的数据。
 >
-> 2.使用new来分配新的存储空间，使得返回指向该内存空间的指针。👉**小缺点**：会忘记使用 `delete` 来`释放内存`。
+> 2.使用`new`来分配新的存储空间，使得返回指向该内存空间的指针。👉**小缺点**：会忘记使用 `delete` 来`释放内存`。
 
 改进后：
 ```C++
@@ -152,7 +275,11 @@ const free_throws & clone(free_throws &ft)
 	return *pt; //返回
 }
 ```
+
+如果返回一个结构，而不是指向结构的引用，将整个结构复制到一个临时变量，再将临时变量拷贝。效率比其他传递方式高。
+
 #### 2.5 对象、继承和引用
+
 **继承**：将语言的特性从`一个类` *传递* 给`另一个类`。
 
 **继承的特征**：派生来继承了基类的方法，基类引用可以指向派生类对象，而`无需进行强制类型转换`。
