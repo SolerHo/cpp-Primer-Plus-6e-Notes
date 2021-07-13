@@ -1,4 +1,4 @@
-# C++ Primer Plus （第六版） 学习笔记
+<h1 align="center">📔 C++ Primer Plus （第六版） 学习笔记</h1>
 
 ### 学习环境
 - ***系统***：`CentOS Linux release 8.0.1905 (Core)`
