@@ -1,3 +1,0 @@
-/data/cxx/cpp-Primer-Plus-6e-Notes/Chapter10/stock10/build/CMakeFiles/rebuild_cache.dir
-/data/cxx/cpp-Primer-Plus-6e-Notes/Chapter10/stock10/build/CMakeFiles/stock10.out.dir
-/data/cxx/cpp-Primer-Plus-6e-Notes/Chapter10/stock10/build/CMakeFiles/edit_cache.dir
