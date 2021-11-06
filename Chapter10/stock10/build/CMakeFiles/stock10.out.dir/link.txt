@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/stock10.out.dir/main.cc.o CMakeFiles/stock10.out.dir/stock10.cc.o -o stock10.out 
