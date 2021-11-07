@@ -20,7 +20,7 @@ int main()
     Stock2.show();
 
     cout << "Using a Construction to reset an object \n";
-    Stock1 = Stock("Nifty Foods",10,50.0); //临时对象
+    Stock1 = Stock("Nifty Foods",10,50.0); //重置，重新进行赋值
     cout << "Revised Stock1 : \n";
     Stock1.show();
     cout << " Done \n";
