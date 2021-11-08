@@ -1,5 +1,5 @@
-// stock10.h 析构函数和构造函数
-// version 10
+// stock20.h 析构函数和构造函数
+// version 20
 
 #ifndef STOCK20_H__
 #define STOCK20_H__
