@@ -22,7 +22,10 @@
     - [4.4.1 将指针用作迭代器](#441-将指针用作迭代器)
     - [4.4.2 其它迭代器](#442-其它迭代器)
   - [4.5 容器种类](#45-容器种类)
-  - [4.6 关联容器](#46-关联容器)
+    - [4.5.1 容器类型](#451-容器类型)
+    - [4.5.2 容器概念](#452-容器概念)
+    - [4.5.3 `序列（sequence）`容 器](#453-序列sequence容-器)
+  - [4.6 关联容器（associative container）](#46-关联容器associative-container)
   - [4.7 无序关联容器（C++11）](#47-无序关联容器c11)
 - [5. 函数对象](#5-函数对象)
   - [5.1 函数符概念](#51-函数符概念)
@@ -33,9 +36,11 @@
   - [6.2 算法的通用特征](#62-算法的通用特征)
   - [6.3 STL和string类](#63-stl和string类)
   - [6.4 函数和容器方法](#64-函数和容器方法)
-  - [6.5 使用STL](#65-使用stl)
 - [7. 其它库](#7-其它库)
   - [7.1 vector、valarray和array](#71-vectorvalarray和array)
+    - [7.1.1 vector](#711-vector)
+    - [7.1.2 valarray](#712-valarray)
+    - [7.1.3 array](#713-array)
   - [7.2 模板initializer_list（C++11）](#72-模板initializer_listc11)
 
 ## 1. string类
@@ -467,65 +472,365 @@ sort(Receipts, Receipts + SIZE); // 等价于 sort(&Receipts[0],&Receipts[SIZE])
 
 - istream_iterator
   ```cpp
-  
+  // 使用两个 istream_iterator 对象来定义 copy() 的输入范围
+  copy(istream_iterator<int,char>(cin),
+      istream_iterator<int,char>(),dice.degin());
+  // 第一个参数：指出要读取的数据类型
+  // 第二个参数：指出输入流使用的字符类型
   ```
 
 #### 4.4.2 其它迭代器
-  - 
+除了 **`istream_iterator`**、**`ostream_iterator`** 之外，还有一些专用的预定义迭代器类型。
+- **`reverse_iterator`**：执行递增操作将导致它被递减。
+  - 只能允许用于尾部快速插入的容器
+- **`back_insert_iterator`**：将元素插入到容器尾部
+- **`front_insert_iterator`**：将元素插入到容器的前端
+  - 只能用于允许在起始位置做时间固定插入的容器类型。
+- **`insert_iterator`**：将元素插入到 insert_iterator 构造函数的参数指定的位置前面。
+  - 无限制
 
+后三种（**`back_insert_iterator`**、**`front_insert_iterator`**、**`insert_iterator`**）通过将复制转换为插入来解决不知道长度或者不覆盖已有内容的问题。原因：只做插入新元素的操作，所以不会覆盖已有数据，并使用自动内存分配来确保可以容纳新的数据信息。
 
+```cpp
+back_insert_iterator<vector<int> > back_iter(dice);
+insert_iterator<vector<int> > insert_iter(dice,dice.begin() );
+```
+
+示例：
+
+```cpp
+#include <iostream>
+#include <string>
+#include <iterator>
+#include <vector>
+#include <algorithm>
+
+void output(const std::string & a) {std::cout << s << " ";}
+
+int main()
+{
+  using namespace std;
+  string s1[4] = {"fine","fish","fashion","fate"};
+  string s2[2] = {"busy","bate"};
+  string s3[2] = {"silly","singer"};
+  vector <string> words(4);
+  copy(s1,s1 + 4,words.begin()); // 将s1中的4个字符串复制到words中
+  for_each(words.begin(),words.end(),output);
+  cout << endl;
+  // 构造匿名对象 back_insert_iterator
+  // 将s2的元素插入到末尾，而且words的长度扩增到6个元素
+  copy(s2,s2+2,back_insert_iterator<vector<string> (words)>);
+  for_each(word.begin(),words.end(),output);
+  cout << endl;
+  // 构造 匿名对象 insert_iterator
+  // 将s3中的元素插入到words第一个元素的前面，words的长度被增加到8个元素
+  copy(s3,s3+2,insert_iterator<vector<string> >(words,words.begin()));
+  for_each(words.begin(),words.end(),output);
+  cout << endl;
+  return 0;
+}
+```
 ### 4.5 容器种类
+STL具有容器概念和容器类型。
+
+概念是具有名称（如容器、序列容器、关联容器等）的通用类别。
+
+#### 4.5.1 容器类型
+- 可用于创建具体容器对象的模板。
+- C++11 之前有11个
+  
+  deque、list、queue、priority_queue、stack、vector、map、multimap、set、multiset和bitset
+
+- C++11中新增5个
+
+  forward_list、unordered_map、unordered_multimap、unordered_set 和 unordered_multiset
+
+#### 4.5.2 容器概念
+容器概念指定了所有STL容器类都必须满足的一系列要求。
+
+- 容器是存储其他对象的对象。被存储的对象必须是`同一种类型`的，可以是`OOP意义上的对象`，也可以是`内置类型值`。
+
+- 存储在容器中的基本类型必须满足：是`可复制构造`和`可赋值`的。
+- 只要类定义没有将可复制构造函数和赋值运算符声明为私有或保护的。
+
+“复杂度”：描述了执行操作所需的时间。
+- 编译时间：在编译时执行，执行时间为0 
+- 固定时间：发生在运行阶段，但独立于对象中的数目
+- 线性时间：时间与元素数目成正比。
+
+#### 4.5.3 `序列（sequence）`容 器
+7种STL容器类型：`deque`、`C++11新增的forward_list`、`list`、`queue`、`priority_queue`、`stack`和`vector` 都是序列。
+
+**`队列`** 可以在 **`队尾添加`** 元素，在 **`队首删除`** 元素。
+
+**`deque`** 表示的 **`双端队列`** 允许在 **`两端添加和删除`** 元素。
+
+序列要求其元素按严格的线性顺序排列，即存在第一个元素、最后一个元素、除第一个元素和最后一个元素外，每个元素前后都有一个元素。
+
+数组和链表是序列，但是分支结构不是。
+
+对于序列，都支持以下的操作：
+
+![](./img/序列的可选操作.png)
+
+在情况允许下，复杂都是固定时间。
+
+- vector
+  - 模板头文件 `vector`
+  - 是数组的一种类表示
+  - 提供`自动内存管理`概念，可以`动态改变vector对象的长`度，随着元素的添加和删除而增大和减小。
+  - 在`尾部`复杂度是：`固定时间`
+  - 在`头部`或`中间`复杂度：`线性时间`
+  - 支持`可反转容器（reversible container）`的两个类方法
+    - **`rbegin()`**：返回一个指向反转序列的第一个元素的迭代器
+    - **`rend()`**：返回反转序列的超尾迭代器
+    - 强调随机快速访问
+
+- deque
+  - 模板头文件 `deque`
+  - 双端队列（double-ended queue）
+  - 在STL中，类似vector，支持随机访问。
+  - 一般发生在起始和结尾处的操作，考虑使用deque
+
+- list
+  - 模板头文件 `list`
+  - `双向链表`
+  - list在链表中任一位置进行插入和删除的复杂度都固定
+  - 元素的`快速插入`和`删除`
+  - list不支持数组表示法和随机访问
+  - `sort()`、`merge()`、`unique()` 和 `remove()`方法
+
+- forward_list（C++11）
+  - 实现了`单链表`
+  - 单链表的特点：每个节点都只链接到下一个节点，而没有链接到前一个节点。
+  - 是一个正向迭代器
+
+- queue
+  - 模板头文件 `queue`
+  - 是一个`适配器类`
+  - **不允许随机访问队列元素，不允许遍历队列**
+  - 使用限制在定义队列的基本操作上，可以将元素进行如下操作：
+    - 添加到队尾
+    - 从队首删除元素
+    - 查看队首和队尾的值
+    - 检查元素数目
+    - 测试队列是否为空
+
+- priority_queue
+  - 模板头文件 `queue`
+  - 是一个`适配器类`
+  - 与queue主要区别： 在priority_queue中，最大元素被移到队首，内部区别在于，默认的底层是 vector
+  - 可修改用于确定哪个元素放到队首的比较方法
+    ```cpp
+    priority_queue<int> pq1; // 使用priority_queue默认方式 排序
+    priority_queue<int> pq2(greater<int>) // 使用greater<int> 排序
+    ```
+- stack
+  - 头文件 `stack`
+  - 是一个适配器类
+  - 不允许随机访问栈元素，也不能遍历栈。
+  - 基本操作和queue类似。
 
 
-### 4.6 关联容器
+### 4.6 关联容器（associative container）
+关联容器是对容器概念的另一个改进。
 
+关联容器将值与键关联在一起，并使用`键来查找值`。
+
+优点：提供对元素的快速访问。允许插入新元素，但`不能指定插入的位置`。关联容器通常是用于确定数据放置的算法。
+
+基于`树（数据结构）`来实现。
+
+树的概念：其根节点链接到一个或两个节点，节点再次分支。
+
+STL提供4种关联容器
+- 头文件 set
+  - set
+    - set的类型与键相同，且键唯一。不会有相同的元素，对于set来说，值就是键。
+  - multiset
+    - 类似set，一个键可能有多个值。
+- 头文件 map
+  - map
+    - 值与键的类型不同，键是唯一的
+    - 每一个键只对应于一个值。
+  - multimap
+    - 类似map，一个键可与多个值相关联。
 
 ### 4.7 无序关联容器（C++11）
+无序关联容器是对容器概念的另一种改进。
 
+关联容器基于树结构实现，而无序关联容器是基于数据结构哈希表来实现。旨在提高添加和删除元素的速度以及提高查找算法的效率。
 
+4种无序关联容器：
+- unordered_set
+- unordered_multiset
+- unordered_map
+- unordered_multimap
 
 ## 5. 函数对象
+很多STL算法都使用函数对象 ---- 也叫 **`函数符（functor）`**。
 
+函数符是可以以函数方式与`()` 结合使用任意对象：`函数名`、`指向函数的指针`和`重载了()运算符的类对象`（即定义了`函数operator()()的类`）
+
+在for_each方法中，第三个参数不能声明函数指针，所以for_each 模板原型为：
+```cpp
+template<class InputIterator, class Function>
+Function for_each(InputIterator first, InputIterator last, Function f);
+```
 
 ### 5.1 函数符概念
-
+STL定义了容器和迭代器的概念，也定义了函数符的概念
+- 生成器（generator）是不用参数即可调用的函数符。
+- 一元函数（unary function）是用一个参数可以调用的函数符
+- 二元函数（binary function）是用两个参数可以调用的函数符
+- 返回bool值的一元函数是谓词（predicate）
+- 返回bool值的二元函数是二元谓词（binary predicate）。
 
 ### 5.2 预定义的函数符
+STL定义了多个基本函数，它们执行诸如两个值相加、比较两个值是否相等的操作。提供这些函数对象是为了支持将函数作为参数的STL函数。
 
+头文件 `functional` 定义了多个模板类函数对象，其中包括了 `plus>()`。
+
+```cpp
+#include <functional>
+...
+plus<double> add; // 创建一个 plus<double> 对象
+double y = add(2.2,3.4); //使用 plus<double>::operator()()
+```
 
 ### 5.3 自适应函数符号和函数适配器
+函数符成为自适应的原因：携带标识参数类型和返回类型的`typedef成员`。这些成员是：
+- result_type
+- first_argument_type
+- second_argument_type
 
-
-
-
-
+函数符自适应的意义在于：函数适配器对象可以使用函数对象，并认为存在这些typedef成员。
 ## 6. 算法
+STL包含很多处理容器的非成员函数。
+- sort()
+- copy()
+- find()
+- random_shuffle()
+- set_union()
+- set_intersection()
+- set_difference()
+- transform()
 
+**`整体设计思想`**：都使用  **`迭代器来标识要处理的数据区间和结果的放置位置`**。
+
+对于算法函数设计：
+- 都使用`模板来提供泛型`
+- 都使用`迭代器`来提供`访问容器中数据的通用表示`
 
 ### 6.1 算法组
+STL将算法库分成4组：
+- 头文件 `algorithm`
+  - **`非修改式序列操作`**
+    - 对区间中的每个元素进行操作。操作`不修改`容器的内容。
+    - 如`find()` 和 `for_each()`
+  - **`修改式序列操作`**
+    - 对区间中的每个元素进行操作。
+    - 可`修改`容器内容（包括修改值、修改值的排列顺序）
+    - 如 `transform()`、`random_shuffle()`、`copy()`
+  - **`排序和相关操作`**
+    - 包含多个排序函数和其它各种函数，包括集合操作
+    - 如 sort()
+- 头文件 `numeric`
+  - **`通用数字运算`**
+    - 包括将区间的内容累积、计算两个容器的内部乘积、计算小计、计算相邻对象差的函数。
+    - 一般是数据的操作特性。
 
 
 ### 6.2 算法的通用特征
+对算法分类的方式之一就是按结果放置的位置来进行分类。
 
+有些算法有两个版本：
+- `就地`版本
+  - `sort()` 函数完成时，将结果存放到原始数据的位置上
+- `复制`版本
+  - copy() 函数将结果发送到另一个位置
 
+transform() 可以是两个版本。
+
+STL中约定：复制版本的名称将以 `_copy()` 来结尾。复制版本接受一个额外的输出迭代参数，参数指定结果的放置位置。
 
 ### 6.3 STL和string类
-
-
+string类虽不是STL的组成部分，但是设计string时考虑到了STL。其中的`begin()`、`rbegin()`、`end()` 和 `rend()` 等成员函数，都可以使用STL接口。
 ### 6.4 函数和容器方法
+有时可以选择使用STL方法或者STL函数，通常方法是更好的选择。
+1. 方法适合于特定的容器
+2. 方法作为成员函数，它可以使用模板类的内存管理工具，从而调整容器的长度。
 
+例如，假设是数字组成链表，要删除特定值的所有实例
+```cpp
+la.remove(4); // 删除值为4的所有元素，删除后链表的长度也会被自动调整
+```
 
+尽管方法通常是更适合，但非方法函数更通用。
 
-### 6.5 使用STL
-
-
+非方法函数可以用于数组、string对象、STL容器，可用来处理混合的容器类型。
 ## 7. 其它库
+头文件 `complex` 为复数提供了`类模板complex`，包含用于 `float`、`long`和`long double` 的`具体化`。这个类提供了标准的复数运算及能够处理复数的标准函数。
 
+C++11新增的头文件 random 提供了更多的随机数功能。
 
+valarray头文件提供的模板类valarray，类模板被设计用于数值数组，支持各种数值数组操作。
 ### 7.1 vector、valarray和array
+C++中提供的3个数组：
+- vector
+- valarray
+- array
+#### 7.1.1 vector
+vector模板类 是一个容器类和算法系统的一部分，支持面向容器的操作。如排序、插入、重新排列、搜索、将数据转移到其它容器中等。
 
 
 
+#### 7.1.2 valarray
+`valarray类模板`是`面向数值计算`的，但不是STL的一部分。它没有 `push_back()` 和 `insert()` 方法。但为很多数学运算提供了一种简单、直观的接口。
+
+假设要计算数组中每个元素的自然对数，并将计算结果存储到另一个数组的相应元素中，STL方法如下：
+```cpp
+transform(ved1.begin(),ved1.end(),ved3.begin(),log);
+```
+valarray类重载了数学函数，使之接受一个valarray参数，并返回一个valarray对象，所以可以：
+```cpp
+ved3 = log(ved1); // log() 重载
+```
+也可以使用 apply() 方法，适用于非重载函数：
+```cpp
+ved3 = ved1.apply(log);
+```
+
+`valarray` 类提供了方法：
+- `sum()`：计算valarray对象中所有元素的和
+- `size()`：返回元素数
+- `max()`：返回最大的元素值
+- `min()`：返回最小的元素值
+
+C++11提供了接受valarray对象作为参数的模板函数 `begin()` 和 `end()`。
+
+```cpp
+sort(begin(vad),end(vad)); // C++11 fix
+```
+#### 7.1.3 array
+array 为替代数组而设计，通过提供更好、更安全的接口，让数组效率更高。
+
+Array表示长度固定的数组，它不支持`push_back()` 和 `insert()`，但提供了STL方法，包括`begin()`、`end()`、`rbegin()` 和 `rend()` 。
 ### 7.2 模板initializer_list（C++11）
 
+头文件 `initializer_list`
 
+模板`initializer_list`是C++11新增。如果类有接受`initializer_list`作为参数的`构造函数`，一般使用表示法 `{ }` 而不是 `()` 来调用`类构造函数`。
+
+```cpp
+shared_ptr<double> pd = {new double}; // 使用 {} 来代替 ()
+
+// 所有的initializer_list 元素的类型都必须相同，如果不相同，编译会进行必要的转换
+std::vector<double> payments {45.99,39.23,19,89}; 
+// 其中的 19和89 会被转换成double类型,不能隐式的窄化转换（double不能转换为int）
+std::vector<double> payments {45.99,39.23,19.0,89.0};
+```
+
+[代码实例](initializer_list.cpp)
+
+可按`值传递` initializer_list 对象，也可按`引用传递`。
